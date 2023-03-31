@@ -1,0 +1,51 @@
+{
+//  "pyproc_case": "home_lhorvath_cmg_catalog_edge2d_jet_96448_mar1522_seq#2_CHERAB_KT1V_inter_ELM",
+//  "pyproc_case": "home_lhorvath_cmg_catalog_edge2d_jet_96449_aug1621_seq#1_CHERAB_KT1J_inter_ELM",
+  "pyproc_case": "home_lhorvath_cmg_catalog_edge2d_jet_96450X_aug2421_seq#1_CHERAB_KT1J_inter_ELM",
+  "diag_list": [
+//    "KS3I"
+//    "KS3J"
+//    "KT1V"
+    "KT1J"
+//    "KS3V"
+  ],
+  "read_ADAS": false,
+  "spec_line_dict": {
+    "1": {
+      "1": {
+        "1215.2": [
+          "2",
+          "1"
+        ],
+        "6561.9": [
+          "3",
+          "2"
+        ],
+        "4101.2": [
+          "6",
+          "2"
+        ],
+        "3969.5": [
+          "7",
+          "2"
+        ]
+      }
+    }
+  },
+  "interactive_plots": false,
+  "save_dir": "/work/lhorvath/pyproc/",
+  "cherab_options": {
+    "spectral_bins": 500,
+//    "pixel_samples": 1000,
+    "pixel_samples": 10000,
+    "import_jet_surfaces": true,
+    "include_reflections": true,
+    "ray_extinction_prob": 0.33,
+    "stark_transition": [6,2],
+    "ff_fb_emission": true,
+    "analyse_synth_spec_features": true,
+    "Sion_H_transition": [[2,1],[3,2]],
+    "Srec_H_transition": [[7,2]]
+  }
+}
+
