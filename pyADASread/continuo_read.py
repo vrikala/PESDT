@@ -18,7 +18,7 @@ def find_nearest(array, value):
 
 def get_fffb_intensity_ratio_fn_T(wv_lo_nm, wv_hi_nm, Zeff, save_output=False, restore=False, build32 = False):
     # TODO: figure out a way to make the path generic and so that it works from both /pyproc and /pyproc/cherab_bridge
-    outfile = '/work/bloman/pyproc/pyADASread/' + (str(wv_lo_nm)+'_'+str(wv_hi_nm)+'_adas_continuo_ratio.npy')
+    outfile = os.path.expanduser('~') + '/PESDT/pyADASread/' + (str(wv_lo_nm)+'_'+str(wv_hi_nm)+'_adas_continuo_ratio.npy')
 
     Te_rnge = [0.2, 30]
     if restore == True:

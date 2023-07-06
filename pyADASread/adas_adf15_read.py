@@ -322,7 +322,7 @@ def get_H_adf15_block(Te_arr, ne_arr, block_key):
     # return 2D coeff(te, dens) in units ph s-1 cm3
     if block_key in line_blocks:
         print('Getting ADF15 data ', block_key, ' from read_adf15...')
-        coeff, info = read_adf15(file=file, block=line_blocks[block_key], te=Te_arr, dens=ne_arr, all=True)
+        coeff, info = read_adf15(file=file, block=line_blocks[block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
     else:
         print(block_key, ' entry does not exist')
 
@@ -341,7 +341,7 @@ def get_imp_adf15_block(imp_line_blocks, Te_arr, ne_arr, nuc_charge, ion_stage, 
                 print('File', adf15file, ' not found.')
                 raise
             print('Getting ADF15 data ', adf15file, nuc_charge, ion_stage, block_key, ' from read_adf15...')
-            coeff, info = read_adf15(file=adf15file, block=line_blocks_lytrap[nuc_charge][ion_stage]['blocks'][block_key], te=Te_arr, dens=ne_arr, all=True)
+            coeff, info = read_adf15(file=adf15file, block=line_blocks_lytrap[nuc_charge][ion_stage]['blocks'][block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
             return coeff, info
         else:
             print(block_key, ' entry does not exist')
@@ -354,7 +354,7 @@ def get_imp_adf15_block(imp_line_blocks, Te_arr, ne_arr, nuc_charge, ion_stage, 
                 print('File', adf15file, ' not found.')
                 raise
             print('Getting ADF15 data ', adf15file, nuc_charge, ion_stage, block_key, ' from read_adf15...')
-            coeff, info = read_adf15(file=adf15file, block=imp_line_blocks[nuc_charge][ion_stage]['blocks'][block_key], te=Te_arr, dens=ne_arr, all=True)
+            coeff, info = read_adf15(file=adf15file, block=imp_line_blocks[nuc_charge][ion_stage]['blocks'][block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
             return coeff, info
         else:
             print(block_key, ' entry does not exist')
@@ -375,7 +375,7 @@ def get_H_adf15_block(Te_arr, ne_arr, block_key):
     # return 2D coeff(te, dens) in units ph s-1 cm3
     if block_key in line_blocks:
         print('Getting ADF15 data ', block_key, ' from read_adf15...')
-        coeff, info = read_adf15(file=file, block=line_blocks[block_key], te=Te_arr, dens=ne_arr, all=True)
+        coeff, info = read_adf15(file=file, block=line_blocks[block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
     else:
         print(block_key, ' entry does not exist')
 
@@ -405,8 +405,8 @@ def get_H_adf15_block_n5(Te_arr, ne_arr, block_key, Ly_beta_esc_fac):
             if block_key in line_blocks_n5:
                 # return 2D coeff(te, dens) in units ph s-1 cm3
                 # print('Getting ADF15 data ', block_key, ' from read_adf15...')
-                coeff_hi, info = read_adf15(file=case_hi['adf15_file'], block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True)
-                coeff_lo, info = read_adf15(file=case_lo['adf15_file'], block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True)
+                coeff_hi, info = read_adf15(file=case_hi['adf15_file'], block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
+                coeff_lo, info = read_adf15(file=case_lo['adf15_file'], block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
                 coeff = coeff_lo + (Ly_beta_esc_fac - case_lo['Ly_beta_esc_fac'])*(coeff_hi-coeff_lo)/(case_hi['Ly_beta_esc_fac'] - case_lo['Ly_beta_esc_fac'])
                 # print('adf15 suppress file hi: ', case_hi['adf15_file'])
                 # print('adf15 suppress file lo: ', case_lo['adf15_file'])
@@ -429,7 +429,7 @@ def get_H_adf15_block_n5(Te_arr, ne_arr, block_key, Ly_beta_esc_fac):
     # return 2D coeff(te, dens) in units ph s-1 cm3
     if block_key in line_blocks_n5:
         # print('Getting ADF15 data ', block_key, ' from read_adf15...')
-        coeff, info = read_adf15(file=file, block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True)
+        coeff, info = read_adf15(file=file, block=line_blocks_n5[block_key], te=Te_arr, dens=ne_arr, all=True, return_info = True)
         # print('Done')
     else:
         print(block_key, ' entry does not exist')
