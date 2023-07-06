@@ -9,9 +9,9 @@ import os
 import sys
 import contextlib
 
-from pyproc.process import ProcessEdgeSim
-from pyproc.pyADASread import adas_adf11_read, adas_adf15_read, continuo_read
-from pyproc.atomic import get_ADAS_dict
+from PESDT.process import ProcessEdgeSim
+from PESDT.pyADASread import adas_adf11_read, adas_adf15_read, continuo_read
+from PESDT.atomic import get_ADAS_dict
 
 class AnalyseSynthDiag(ProcessEdgeSim):
     """
@@ -21,7 +21,7 @@ class AnalyseSynthDiag(ProcessEdgeSim):
         self.input_dict = input_dict
 
         tmpstr = input_dict['edge_code']['sim_path'].replace('/','_')
-
+        print(input_dict['edge_code']['sim_path'])
         if tmpstr[:3] == '_u_':
             tmpstr = tmpstr[3:]
         elif tmpstr[:6] == '_work_':
@@ -38,9 +38,9 @@ class AnalyseSynthDiag(ProcessEdgeSim):
             if e.errno != errno.EEXIST:
                 raise
 
-        self.data2d_save_file = self.savedir +'pyproc.2ddata.pkl'
-        self.synth_diag_save_file = self.savedir + 'pyproc.synth_diag.json'
-        self.proc_synth_diag_save_file = self.savedir+ 'pyproc.proc_synth_diag.json'
+        self.data2d_save_file = self.savedir +'PESDT.2ddata.pkl'
+        self.synth_diag_save_file = self.savedir + 'PESDT.synth_diag.json'
+        self.proc_synth_diag_save_file = self.savedir+ 'PESDT.proc_synth_diag.json'
         self.spec_line_dict = input_dict['spec_line_dict']
 
         # Option to use cherab ne and Te fits rather than pyproc's. Use case - Lyman opacity adas data is not suppored

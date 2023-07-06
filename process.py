@@ -5,14 +5,17 @@ import numpy as np
 import pickle
 import json
 import idlbridge as idl
+import struct
+
+import eproc as ep
 from matplotlib.collections import PatchCollection
 from matplotlib import patches
 from scipy.interpolate import interp1d
 from shapely.geometry import Polygon, LineString
-from pyproc.machine_defs import get_DIIIDdefs, get_JETdefs
-from pyproc.pyADASread import adas_adf11_read, adas_adf15_read, continuo_read
-from pyproc.edge_code_formats.edge2d_format import Edge2D
-from pyproc.edge_code_formats.solps_format import SOLPS
+from PESDT.machine_defs import get_DIIIDdefs, get_JETdefs
+from PESDT.pyADASread import adas_adf11_read, adas_adf15_read, continuo_read
+from PESDT.edge_code_formats.edge2d_format import Edge2D, Cell
+from PESDT.edge_code_formats.solps_format import SOLPS
 
 
 at_sym = ['H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg',
@@ -25,6 +28,10 @@ at_sym = ['H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg',
           'HG','TL','PB','BI','PO','AT','RN','FR','RA','AC','TH','P']
 
 roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+
+def floatToBits(f):
+    s = struct.pack('>f', f)
+    return struct.unpack('>l', s)[0]
 
 def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
@@ -100,10 +107,10 @@ class Region:
         return False
     
 class ProcessEdgeSim:
-    """
-        Class to read and store EDGE2D-EIRENE results
-    """
-    def __init__(self, ADAS_dict, edge_code_defs, ADAS_dict_lytrap=None, 
+    '''
+    Class to read and store EDGE2D-EIRENE results
+    '''
+    def __init__(self, ADAS_dict, edge_code_defs, ADAS_dict_lytrap=None,
                  machine='JET', pulse=90531, interactive_plots = False,
                  spec_line_dict=None, spec_line_dict_lytrap = None, 
                  diag_list=None, calc_synth_spec_features=None,
@@ -180,12 +187,61 @@ class ProcessEdgeSim:
         
         # New (04-Mar-2021) way of reading edge code data
         if self.edge_code == 'edge2d':
-            self.mesh_data = Edge2D(self.sim_path)
-            self.cells = self.mesh_data.quad_cells            
+            self.data = Edge2D(self.sim_path)
+            #self.cells = self.data.quad_cells
+            self.cells = self.data.cells          
         elif self.edge_code == 'solps':
-            self.mesh_data = SOLPS(self.sim_path)
-            self.cells = self.mesh_data.tri_cells            
+            self.data = SOLPS(self.sim_path)
+            self.cells = self.data.tri_cells            
+            
+        # For compatability reasons, copy everything over manually.
+        # If we want to continue to use separate "<sol_code>_format.py" files
+        # to read results, the best way moving forward would be to just use self.data.
+        # This, however, would require changes to multiple places in the code, which 
+        # I don't have the time for right now. - V.-P Rikala
+        self.geom = self.data.geom
+        self.teve = self.data.teve
+        self.den = self.data.den
+        self.denel = self.data.denel
+        self.da = self.data.da
+        self.korpg = self.data.korpg
+        self.rmesh = self.data.rmesh
+        self.rvertp = self.data.rvertp
+        self.zmesh = self.data.zmesh
+        self.zvertp = self.data.zvertp
+        self.NE2Ddata = self.data.NE2Ddata
+        self.patches = self.data.patches
+        #self.H_adf11 = self.data.H_adf11
 
+        self.sep_poly = self.data.sep_poly
+        self.shply_sep_poly = self.data.shply_sep_poly
+        self.sep_poly_below_xpt = self.data.sep_poly_below_xpt
+        self.shply_sep_poly_below_xpt = self.data.shply_sep_poly_below_xpt
+
+        self.wall_poly = self.data.wall_poly
+        self.shply_wall_poly = self.data.shply_wall_poly
+
+        self.rv = self.data.rv
+        self.zv = self.data.zv
+        
+        self.osp = self.data.osp
+        self.isp = self.data.isp
+
+        # variables mapped onto edge_codes grid
+        self.te = self.data.te
+        self.ne = self.data.ne
+        self.ni = self.data.ni
+        self.n0 = self.data.n0
+
+        # impurities
+        self.zch = self.data.zch
+        self.imp1_atom_num = self.data.imp1_atom_num
+        self.imp2_atom_num = self.data.imp2_atom_num
+        self.imp1_chrg_idx = self.data.imp1_chrg_idx
+        self.imp2_chrg_idx = self.data.imp2_chrg_idx
+        self.imp1_denz = self.data.imp1_denz
+        self.imp2_denz = self.data.imp2_denz
+        
         # Interpolate any outlier cells using specified neighbours R,Z coords. Interpolated cell's plasma properties
         # are averages of its neighbours weighted by the distance between centroids.
         # self.interp_outlier_cells()
@@ -199,21 +255,21 @@ class ProcessEdgeSim:
                 self.regions['vessel'] = Region('vessel', Rmin=0, Rmax=10, Zmin=-10, Zmax=10,
                                         include_confined=True, include_SOL=True, include_PFR=True)
     
-                self.regions['hfs_sol'] = Region('hfs_sol', Rmin=0, Rmax=self.mesh_data.geom['rpx'], Zmin=self.Zdiv, Zmax=10,
+                self.regions['hfs_sol'] = Region('hfs_sol', Rmin=0, Rmax=self.data.geom['rpx'], Zmin=self.Zdiv, Zmax=10,
                                         include_confined=False, include_SOL=True, include_PFR=False)
-                self.regions['lfs_sol'] = Region('lfs_sol', Rmin=self.mesh_data.geom['rpx'], Rmax=10, Zmin=self.Zdiv, Zmax=10,
+                self.regions['lfs_sol'] = Region('lfs_sol', Rmin=self.data.geom['rpx'], Rmax=10, Zmin=self.Zdiv, Zmax=10,
                                         include_confined=False, include_SOL=True, include_PFR=False)
-                self.regions['hfs_div'] = Region('hfs_div', Rmin=0, Rmax=self.mesh_data.geom['rpx'], Zmin=-10, Zmax=self.Zdiv,
+                self.regions['hfs_div'] = Region('hfs_div', Rmin=0, Rmax=self.data.geom['rpx'], Zmin=-10, Zmax=self.Zdiv,
                                         include_confined=False, include_SOL=True, include_PFR=False)
-                self.regions['lfs_div'] = Region('lfs_div', Rmin=self.mesh_data.geom['rpx'], Rmax=10, Zmin=-10, Zmax=self.Zdiv,
+                self.regions['lfs_div'] = Region('lfs_div', Rmin=self.data.geom['rpx'], Rmax=10, Zmin=-10, Zmax=self.Zdiv,
                                         include_confined=False, include_SOL=True, include_PFR=False)
-                self.regions['xpt_conreg'] = Region('xpt_conreg', Rmin=2.3, Rmax=2.95, Zmin=self.mesh_data.geom['zpx'], Zmax=-0.80,
+                self.regions['xpt_conreg'] = Region('xpt_conreg', Rmin=2.3, Rmax=2.95, Zmin=self.data.geom['zpx'], Zmax=-0.80,
                                         include_confined=True, include_SOL=False, include_PFR=False)
-                self.regions['hfs_lower'] = Region('hfs_lower', Rmin=0, Rmax=self.mesh_data.geom['rpx'], Zmin=-10, Zmax=self.Zdiv,
+                self.regions['hfs_lower'] = Region('hfs_lower', Rmin=0, Rmax=self.data.geom['rpx'], Zmin=-10, Zmax=self.Zdiv,
                                         include_confined=True, include_SOL=True, include_PFR=True)
-                self.regions['lfs_lower'] = Region('lfs_lower', Rmin=self.mesh_data.geom['rpx'], Rmax=10, Zmin=-10, Zmax=self.Zdiv,
+                self.regions['lfs_lower'] = Region('lfs_lower', Rmin=self.data.geom['rpx'], Rmax=10, Zmin=-10, Zmax=self.Zdiv,
                                         include_confined=True, include_SOL=True, include_PFR=True)
-                self.regions['rhon_09_10'] = Region('rhon_09_10', Rmin=0, Rmax=10, Zmin=self.mesh_data.geom['zpx'], Zmax=10,
+                self.regions['rhon_09_10'] = Region('rhon_09_10', Rmin=0, Rmax=10, Zmin=self.data.geom['zpx'], Zmax=10,
                                         include_confined=True, include_SOL=False, include_PFR=False)
         elif self.machine == 'DIIID' and self.edge_code == 'edge2d':
             self.defs = get_DIIIDdefs()
@@ -235,8 +291,8 @@ class ProcessEdgeSim:
         # if (self.mesh_data.imp1_atom_num or self.mesh_data.imp2_atom_num):
         #     self.calc_imp_rad_power()
 
-        if self.spec_line_dict and (self.mesh_data.imp1_atom_num 
-            or self.mesh_data.imp2_atom_num):
+        if self.spec_line_dict and (self.data.imp1_atom_num 
+            or self.data.imp2_atom_num):
             self.calc_imp_emiss()
 
         # CALULCATE PRAD IN DEFINED MACRO REGIONS
@@ -485,7 +541,7 @@ class ProcessEdgeSim:
         # Te_arr_adf11 = np.logspace(np.log10(Te_rnge[0]), np.log10(Te_rnge[1]), 500)
         # ne_arr_adf11 = np.logspace(np.log10(ne_rnge[0]), np.log10(ne_rnge[1]), 30)
 
-        e2d_imps = self.mesh_data.zch['data'][0:2]
+        e2d_imps = self.data.zch['data'][0:2]
         for e2d_imp_idx, e2d_at_num in enumerate(e2d_imps):
             for req_at_num in self.spec_line_dict:
                 if int(req_at_num) == int(e2d_at_num):
@@ -524,7 +580,7 @@ class ProcessEdgeSim:
 
     def calc_imp_rad_power(self):
 
-        e2d_imps = self.mesh_data.zch['data'][0:2]
+        e2d_imps = self.data.zch['data'][0:2]
         for e2d_imp_idx, e2d_at_num in enumerate(e2d_imps):
             if e2d_imp_idx == 0 and e2d_at_num > 0: # impurity 1
                 print('Calculating impurity (atomic num. =' , e2d_at_num, ') power...')
@@ -636,54 +692,54 @@ class ProcessEdgeSim:
         """ TODO: CHECK THIS PROCEDURE WITH DEREK/JAMES"""
 
         # LFS
-        endidx = self.mesh_data.qpartot_LFS['npts']
-        xidx, = np.where(self.mesh_data.qpartot_LFS['xdata'][0:endidx] > 0.0)
+        endidx = self.data.qpartot_LFS['npts']
+        xidx, = np.where(np.array(self.data.qpartot_LFS['xdata'][0:endidx]) > 0.0)
         # CONVERT QPAR TO QPOL (QPOL = QPAR * Btheta/Btot)
-        qpol_LFS = self.mesh_data.qpartot_LFS['ydata'][xidx] * self.mesh_data.bpol_btot_LFS['ydata'][xidx]
+        qpol_LFS = np.array(self.data.qpartot_LFS['ydata'])[xidx] * np.array(self.data.bpol_btot_LFS['ydata'])[xidx]
         # calculate DR from neighbours
         dR_LFS = np.zeros((len(xidx)))
         for idx, val in enumerate(xidx):
-            left_neighb = np.sqrt(((self.mesh_data.qpartot_LFS_rmesh['ydata'][val]-
-                                    self.mesh_data.qpartot_LFS_rmesh['ydata'][val-1])**2)+
-                                  ((self.mesh_data.qpartot_LFS_zmesh['ydata'][val]-
-                                    self.mesh_data.qpartot_LFS_zmesh['ydata'][val-1])**2))
+            left_neighb = np.sqrt(((self.data.qpartot_LFS_rmesh['ydata'][val]-
+                                    self.data.qpartot_LFS_rmesh['ydata'][val-1])**2)+
+                                  ((self.data.qpartot_LFS_zmesh['ydata'][val]-
+                                    self.data.qpartot_LFS_zmesh['ydata'][val-1])**2))
             if val != xidx[-1]:
-                right_neighb = np.sqrt(((self.mesh_data.qpartot_LFS_rmesh['ydata'][val+1]-
-                                         self.mesh_data.qpartot_LFS_rmesh['ydata'][val])**2)+
-                                       ((self.mesh_data.qpartot_LFS_zmesh['ydata'][val+1]-
-                                         self.mesh_data.qpartot_LFS_zmesh['ydata'][val])**2))
+                right_neighb = np.sqrt(((self.data.qpartot_LFS_rmesh['ydata'][val+1]-
+                                         self.data.qpartot_LFS_rmesh['ydata'][val])**2)+
+                                       ((self.data.qpartot_LFS_zmesh['ydata'][val+1]-
+                                         self.data.qpartot_LFS_zmesh['ydata'][val])**2))
             else:
                 right_neighb = left_neighb
             dR_LFS[idx] = (left_neighb+right_neighb)/2.0
-        area = 2. * np.pi * self.mesh_data.qpartot_LFS_rmesh['ydata'][xidx] * dR_LFS
+        area = 2. * np.pi * np.array(self.data.qpartot_LFS_rmesh['ydata'])[xidx] * dR_LFS
         self.qpol_div_LFS = np.sum(qpol_LFS*area)
 
         # HFS
-        endidx = self.mesh_data.qpartot_HFS['npts']
-        xidx, = np.where(self.mesh_data.qpartot_HFS['xdata'][0:endidx] > 0.0)
+        endidx = self.data.qpartot_HFS['npts']
+        xidx, = np.where(np.array(self.data.qpartot_HFS['xdata'])[0:endidx] > 0.0)
         # CONVERT QPAR TO QPOL (QPOL = QPAR * Btheta/Btot)
-        qpol_HFS = self.mesh_data.qpartot_HFS['ydata'][xidx] * self.mesh_data.bpol_btot_HFS['ydata'][xidx]
+        qpol_HFS = np.array(self.data.qpartot_HFS['ydata'])[xidx] * np.array(self.data.bpol_btot_HFS['ydata'])[xidx]
         # calculate dR from neighbours
         dR_HFS = np.zeros((len(xidx)))
         for idx, val in enumerate(xidx):
-            left_neighb = np.sqrt(((self.mesh_data.qpartot_HFS_rmesh['ydata'][val]-
-                                    self.mesh_data.qpartot_HFS_rmesh['ydata'][val-1])**2)+
-                                  ((self.mesh_data.qpartot_HFS_zmesh['ydata'][val]-
-                                    self.mesh_data.qpartot_HFS_zmesh['ydata'][val-1])**2))
+            left_neighb = np.sqrt(((self.data.qpartot_HFS_rmesh['ydata'][val]-
+                                    self.data.qpartot_HFS_rmesh['ydata'][val-1])**2)+
+                                  ((self.data.qpartot_HFS_zmesh['ydata'][val]-
+                                    self.data.qpartot_HFS_zmesh['ydata'][val-1])**2))
             if val != xidx[-1]:
-                right_neighb = np.sqrt(((self.mesh_data.qpartot_HFS_rmesh['ydata'][val+1]-
-                                         self.mesh_data.qpartot_HFS_rmesh['ydata'][val])**2)+
-                                       ((self.mesh_data.qpartot_HFS_zmesh['ydata'][val+1]-
-                                         self.mesh_data.qpartot_HFS_zmesh['ydata'][val])**2))
+                right_neighb = np.sqrt(((self.data.qpartot_HFS_rmesh['ydata'][val+1]-
+                                         self.data.qpartot_HFS_rmesh['ydata'][val])**2)+
+                                       ((self.data.qpartot_HFS_zmesh['ydata'][val+1]-
+                                         self.data.qpartot_HFS_zmesh['ydata'][val])**2))
             else:
                 right_neighb = left_neighb
             dR_HFS[idx] = (left_neighb+right_neighb)/2.0
-        area = 2. * np.pi * self.mesh_data.qpartot_HFS_rmesh['ydata'][xidx] * dR_HFS
+        area = 2. * np.pi * np.array(self.data.qpartot_HFS_rmesh['ydata'])[xidx] * dR_HFS
         self.qpol_div_HFS = np.sum(qpol_HFS*area)
 
         print('Pdiv_LFS (MW): ', self.qpol_div_LFS*1.e-06, 'Pdiv_HFS (MW): ', 
               self.qpol_div_HFS*1.e-06, 'POWSOL (MW): ', 
-              self.mesh_data.powsol['data'][ self.mesh_data.powsol['npts']-1]*1.e-06)
+              self.data.powsol['data'][ self.data.powsol['npts']-1]*1.e-06)
 
 
     def calc_region_aggregates(self):
@@ -693,7 +749,7 @@ class ProcessEdgeSim:
         #   ionisation and recombination
         for regname, region in self.regions.items():
             for cell in self.cells:
-                if region.cell_in_region(cell, self.mesh_data.shply_sep_poly):
+                if region.cell_in_region(cell, self.data.shply_sep_poly):
                     region.cells.append(cell)
                     region.Prad_units = 'W'
                     region.Prad_H += cell.H_radpwr
@@ -1485,49 +1541,6 @@ class SynthDiag:
             ax3.set_xlabel('R tile 5 (m)')
             ax3.set_ylabel(r'$\mathrm{ph\/s^{-1}\/m^{-2}\/sr^{-1}\/nm^{-1}}$')
                 # ax3.plot(chord.v2unmod[0], np.sum(chord.los_1d['H_emiss']['6561.9']['recom']), 'rx', markersize=10),
-
-class Cell:
-
-    def __init__(self, R=None, Z=None, row=None, ring=None,
-                 poly=None, te=None, ti=None, ne=None, ni=None, n0=None,
-                 Srec=None, Sion=None, imp1_den=None, imp2_den=None):
-
-        self.R = R # m
-        self.Z = Z # m
-        self.row = row
-        self.ring = ring
-        self.poly = poly
-        self.te = te # eV
-        self.ti = ti # eV
-        self.ni = ni # m^-3
-        self.ne = ne # m^-3
-        self.n0 = n0 # m^-3
-        self.imp1_den = imp1_den # m^-3
-        self.imp2_den = imp2_den # m^-3
-        self.imp1_radpwr = []
-        self.imp1_radpwr_perm3 = [] # W m^-3
-        self.imp1_radpwr_coeff = [] # W m^3
-        self.imp2_radpwr = []
-        self.imp2_radpwr_perm3 = [] # W m^-3
-        self.imp2_radpwr_coeff = []  # W m^3
-        self.H_emiss = {}
-        self.ff_fb_filtered_emiss = None
-        self.ff_radpwr = None
-        self.ff_radpwr_perm3 = None
-        self.ff_fb_radpwr = None
-        self.ff_fb_radpwr_perm3 = None
-        self.H_radpwr = None
-        self.H_radpwr_perm3 = None  # W m^-3
-        self.H_radpwr_Lytrap = None
-        self.H_radpwr_Lytrap_perm3 = None  # W m^-3
-        self.imp_emiss = {}
-        self.Srec = Srec # m^-3 s^-1
-        self.Sion = Sion # m^-3 s^-1
-
-        # LOS ORTHOGONAL POLYGON PROPERTIES
-        self.dist_to_los_v1 = None
-        self.los_ortho_width = None
-        self.los_ortho_delL = None
 
 if __name__=='__main__':
     print('')

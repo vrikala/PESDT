@@ -6,7 +6,7 @@ Created on Sun Nov 17 21:51:08 2019
 @author: bloman
 """
 from collections import OrderedDict
-from pyproc.plot_old import Plot
+from PESDT.plot_old import Plot
 import matplotlib
 # matplotlib.use('TKAgg', force=True)
 import matplotlib.pyplot as plt

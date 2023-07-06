@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from matplotlib import patches, ticker
 from collections import OrderedDict
-from pyproc import process
-from pyproc.atomic import get_ADAS_dict
+from PESDT import process
+from PESDT.atomic import get_ADAS_dict
 # from pyproc.process import ProcessEdgeSim
 
 from scipy.constants import Planck, speed_of_light
@@ -60,29 +60,27 @@ def find_nearest(array, value):
 
 class Plot():
     """
-        Class for retrieving, reducing and plotting pyproc saved data
+        Class for retrieving, reducing and plotting PESDT saved data
     """
     def __init__(self, work_dir, case, plot_dict=None, icase=1):
         self.work_dir = work_dir
         self.case = case
         self.plot_dict = plot_dict
         self.icase = icase
-
         # Cherab flags
         self.cherab_bridge = False
         self.cherab_reflection = False
         self.cherab_abs_fac_dict = None
         # Read pickled pyproc object
         try:
-            with open(self.work_dir + self.case + '/pyproc.2ddata.pkl', 'rb') as f:
+            with open(self.work_dir + self.case + '/PESDT.2ddata.pkl', 'rb') as f:
                 self.__data2d = pickle.load(f)
         except IOError as e:
             raise
 
         # Read processed synth diag saved data
         try:
-            with open(self.work_dir + self.case +  '/pyproc.proc_synth_diag.json', 'r') as f:
-            # with open(self.work_dir + self.case +  '/pyproc.synth_diag.json', 'r') as f:
+            with open(self.work_dir + self.case +  '/PESDT.proc_synth_diag.json', 'r') as f:
                 self.__res_dict = json.load(f)
         except IOError as e:
             raise
@@ -1370,7 +1368,7 @@ class Plot():
             if int(at_num) > 1:
                 spec_line.append(cell.imp_emiss[at_num][ion_stage][line_key]['excit'] +
                                 cell.imp_emiss[at_num][ion_stage][line_key]['recom'])
-            else:
+            else:	
                 spec_line.append(cell.H_emiss[line_key]['excit'] +
                                 cell.H_emiss[line_key]['recom'])
 

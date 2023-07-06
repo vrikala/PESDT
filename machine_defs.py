@@ -1,5 +1,6 @@
 
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from matplotlib import patches
 from math import atan
@@ -79,7 +80,7 @@ def poloidal_angle(p1, p2):
 
 def get_JETdefs(plot_defs = False, pulse_ref = 90531):
 
-    fwall = 'JET/wall.txt'
+    fwall = os.path.expanduser('~')+ '/PESDT/' + 'JET/wall.txt'
     wall_coords = np.genfromtxt(fwall, delimiter=' ')
     wall_poly = patches.Polygon(wall_coords, closed=False, ec='k', lw=2.0, fc='None', zorder=10)
 
@@ -159,7 +160,37 @@ def get_JETdefs(plot_defs = False, pulse_ref = 90531):
         los_dict['id'].append(str(id+1))
     JET.set_diag_los('KS3I', los_dict)
 
-
+    ###############
+    # KS3O
+    ###############
+    # KS3 outer divertor
+    # R/z coords are from Surf, (/home/flush/surf/input/overlays_db.dat)
+    origin = [2.785, 3.527]
+    width = 0.033
+    p2 = np.array(([2.62, -1.614],
+                   [2.665, -1.628],
+                   [2.703, -1.641],
+                   [2.744, -1.652],
+                   [2.787, -1.665],
+                   [2.831, -1.712],
+                   [2.875, -1.716],
+                   [2.911, -1.380],
+                   [2.963, -1.336],
+                   [3.020, -1.327]))
+    ks3o_los = np.zeros((len(p2), 3,2))
+    for i in range(len(p2)):
+        ks3o_los[i, 0] = origin
+        ks3o_los[i, 1] = p2[i]
+        ks3o_los[i, 2] = [0, width]
+    los_dict = {}
+    los_dict['p1'] = ks3o_los[:,0]
+    los_dict['p2'] = ks3o_los[:,1]
+    los_dict['w'] = ks3o_los[:,2]
+    los_dict['id'] = []
+    for id in range(len(ks3o_los)):
+        los_dict['id'].append(str(id+1))
+    JET.set_diag_los('KS3O', los_dict)
+         
     ###############
     # KS3H
     ###############
@@ -429,9 +460,9 @@ def get_JETdefs(plot_defs = False, pulse_ref = 90531):
     ###############
     #Default vs. re-configured sight line config
     if JET.pulse_ref >=73758 and JET.pulse_ref <=82263:
-        file = 'JET/KB5_Bolometer_LOS_73758_82263.txt'
+        file = os.path.expanduser('~') + '/PESDT/JET/KB5_Bolometer_LOS_73758_82263.txt'
     else:
-        file = 'JET/KB5_Bolometer_LOS_default.txt'
+        file = os.path.expanduser('~') + '/PESDT/JET/KB5_Bolometer_LOS_default.txt'
     lines = np.genfromtxt(file, dtype=list, delimiter="\t", skip_header=3)
 
     # KB5
@@ -511,7 +542,7 @@ def get_JETdefs(plot_defs = False, pulse_ref = 90531):
     ###############
     half_angle= 5.85 * np.pi / 180.
 
-    file = 'JET/B3D4_Bolometer_LOS.txt'
+    file = os.path.expanduser('~') + '/PESDT/JET/B3D4_Bolometer_LOS.txt'
     lines = np.genfromtxt(file, dtype=list, delimiter="\t", skip_header=3)
 
     # B3D4
@@ -546,7 +577,7 @@ def get_JETdefs(plot_defs = False, pulse_ref = 90531):
     ###############
     half_angle= 5.85 * np.pi / 180.
 
-    file = 'JET/B3E4_Bolometer_LOS.txt'
+    file = os.path.expanduser('~') + '/PESDT/JET/B3E4_Bolometer_LOS.txt'
     lines = np.genfromtxt(file, dtype=list, delimiter="\t", skip_header=3)
 
     # B3D4
