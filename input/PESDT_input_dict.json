@@ -1,0 +1,60 @@
+{
+  "machine": "JET",
+  "edge_code": {"code": "edge2d", "sim_path": "/home/jhl7340/edge2d_tran/nhorst_81472_nov_1419_seq#2/tran"},
+  "diag_list": [
+    "KT3A",
+    "KT3B",
+    "KT1V",
+	 "KS3O"
+  ],
+  "pulse": 81472,
+  "read_ADAS": true,
+  "spec_line_dict": {
+    "1": {
+      "1": {
+        "1215.2": [
+          "2",
+          "1"
+        ],
+        "1025.3": [
+          "3",
+          "1"
+        ],
+        "972.1": [
+        "4",
+        "1"
+        ],
+        "6561.9": [
+          "3",
+          "2"
+        ],
+        "4860.6": [
+          "4",
+          "2"
+        ],
+        "4339.9": [
+          "5",
+          "2"
+        ],
+        "4101.2": [
+          "6",
+          "2"
+        ],
+        "3969.5": [
+          "7",
+          "2"
+        ]
+        }
+      }
+  },
+  "interactive_plots": false,
+  "save_dir": "PESDT_cases/", 
+  "run_options": {
+    "calc_synth_spec_features": true,
+    "analyse_synth_spec_features": true,
+    "calc_NII_afg_feature": false,
+    "Sion_H_transition": [[2,1],[3,2]],
+    "Srec_H_transition": [[7,2]]
+    }
+}
+
