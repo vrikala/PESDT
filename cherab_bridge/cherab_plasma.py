@@ -50,7 +50,7 @@ class CherabPlasma():
             if self.include_reflections:
                 import_jet_mesh(self.world)
             else:
-                import_jet_mesh(self.world, material=AbsorbingSurface())
+                import_jet_mesh(self.world, override_material=AbsorbingSurface())
 
         # create atomic data source
         # adas = OpenADAS(permit_extrapolation=True)

@@ -1,17 +1,15 @@
-# use 'source' to run script
-export PYTHONPATH=''
-export PYTHONPATH=${PYTHONPATH}:/home/bloman/
-export PYTHONPATH=${PYTHONPATH}:/home/bloman/cherab/
-export PYTHONPATH=${PYTHONPATH}:/home/adas/python
 
-module purge
-module load standard/2014-08-12
-module load python/3.5
+export PYTHONPATH=$PYTHONPATH:"/home/adas/python/"
+export PYTHONPATH=$PYTHONPATH:"home/jhl7340/"
+export PYTHONPATH=$PYTHONPATH:"home/jhl7340/PESDT/"
+export PYTHONPATH=$PYTHONPATH:"home/jhl7340/eproc/EPROC/python/eproc"
+export PYTHONPATH=$PYTHONPATH:"home/jhl7340/eproc/EPROC/python"
+export CHERAB_CADMESH='/common/cadmesh/'
+
+module unload python/2.7.5
+module load python/3.9
 module load jet
-module load mdsplus/6.1
-
-export ADASHOME="/home/adas"
-
-export CHERAB_CADMESH=/projects/cadmesh/
+a=var$(python3 --version)
+echo $a
 
 

@@ -6,7 +6,7 @@ import json, pprint, pickle
 import operator
 from functools import reduce
 import matplotlib
-matplotlib.use('TKAgg', force=True)
+#matplotlib.use('TKAgg', force=True)
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from matplotlib import patches, ticker
@@ -92,11 +92,12 @@ class Plot():
                 self.cherab_bridge = plot_dict['cherab_bridge_results']
                 if self.cherab_bridge:
                     self.cherab_abs_fac_dict = plot_dict['cherab_abs_factor']
-                    cherab_res_file = self.work_dir + self.case + '/cherab.synth_diag.json'
                     if 'cherab_reflections' in plot_dict:
                         self.cherab_reflections = plot_dict['cherab_reflections']
                         if self.cherab_reflections:
                             cherab_res_file = self.work_dir + self.case + '/cherab_refl.synth_diag.json'
+                        else:
+                            cherab_res_file = self.work_dir + self.case + '/cherab.synth_diag.json'
                     try:
                         with open(cherab_res_file, 'r') as f:
                             self.__cherab_res_dict = json.load(f)
@@ -1777,7 +1778,7 @@ if __name__=='__main__':
         # ('4', {'4058.90':['3d', '3p']})
     ])
 
-    beryllium_lines_dict = OrderedDict([
+    beryllium_lines_dict = Ord002eredDict([
         ('2', {'5272.32':['4s', '3p']})
     ])
 

@@ -316,10 +316,11 @@ class AnalyseSynthDiag(ProcessEdgeSim):
                 ###############################################################
                 # CALCULATE EFFECTIVE DEL_L USING LINE-INT ne AND Te VALUES AND CONTINUUM
                 ###############################################################
-                cond_a = 'stark' in res_dict[diag_key][chord_key]['los_int']
-                cond_b = 'fit' in res_dict[diag_key][chord_key]['los_int']['stark']['fit']
-                cond_c = 'ne' in res_dict[diag_key][chord_key]['los_int']['stark']['fit']
-                if cond_a and cond_b and cond_c:
+                try:
+                    cond= 'ne' in res_dict[diag_key][chord_key]['los_int']['stark']['fit']
+                except:
+                    cond = False
+                if cond:
                     params = Parameters()
                     params.add('delL', value=0.5, min=0.0001, max=10.0)
                     params.add('te_360_400', value=fit_te_360_400)

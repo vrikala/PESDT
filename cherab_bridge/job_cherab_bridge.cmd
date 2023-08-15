@@ -1,8 +1,8 @@
-# @ executable = /home/lhorvath/bloman_tools/pyproc/cherab_bridge/batch_cherab_bridge
+# @ executable = /home/jhl7340/PESDT/cherab_bridge/batch_cherab_bridge
 # @ input = /dev/null
-# @ error = /home/lhorvath/bloman_tools/pyproc/cherab_bridge/batch/job50.err
-# @ output = /home/lhorvath/bloman_tools/pyproc/cherab_bridge/batch/job50.out
-# @ initialdir = /home/lhorvath/bloman_tools/pyproc/cherab_bridge
-# @ notify_user = lhorvath
+# @ error = /home/jhl7340/PESDT/cherab_bridge/batch/job50.err
+# @ output = /home/jhl7340/PESDT/cherab_bridge/batch/job50.out
+# @ initialdir = /home/jhl7340/
+# @ notify_user = jhl7340
 # @ notification = complete
 # @ queue

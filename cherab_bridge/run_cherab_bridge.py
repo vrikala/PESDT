@@ -281,8 +281,8 @@ if __name__=='__main__':
                                                                                 spectral_bins=spectral_bins, pixel_samples=pixel_samples)
 
                         outdict[diag_key][diag_chord]['los_int']['H_emiss'][H_line_key] = {
-                            'excit':exc_radiance,
-                            'recom':rec_radiance,
+                            'excit':(np.array(exc_radiance)*1e6).tolist(),
+                            'recom':(np.array(rec_radiance)*1e6).tolist(),
                             'units':'ph.s^-1.m^-2.sr^-1'
                         }
 
@@ -301,7 +301,7 @@ if __name__=='__main__':
                                                                                     display_progress=False)
 
                                 outdict[diag_key][diag_chord]['los_int']['stark']={'cwl': wavelength, 'wave': wave_arr.tolist(),
-                                                                                  'intensity': spectrum.tolist(),
+                                                                                  'intensity': (spectrum*1e6).tolist(),
                                                                                   'units': 'nm, ph s^-1 m^-2 sr^-1 nm^-1'}
 
                     # Free-free + free-bound using adaslib/continuo
@@ -320,14 +320,15 @@ if __name__=='__main__':
 
                             outdict[diag_key][diag_chord]['los_int']['ff_fb_continuum'] = {
                                 'wave': wave_arr.tolist(),
-                                'intensity': spectrum.tolist(),
+                                'intensity': (spectrum*1e6).tolist(),
                                 'units': 'nm, ph s^-1 m^-2 sr^-1 nm^-1'}
 
 
     # Analyse synthetic spectra
     if input_dict['cherab_options']['analyse_synth_spec_features']:
         AnalyseSynthDiag.recover_line_int_Stark_ne(outdict)
-        AnalyseSynthDiag.recover_line_int_ff_fb_Te(outdict)
+        if ff_fb:
+            AnalyseSynthDiag.recover_line_int_ff_fb_Te(outdict)
         recover_line_int_particle_bal(ADAS_dict, outdict, sion_H_transition=sion_H_transition,
                                       srec_H_transition=srec_H_transition, ne_scal=1.0)
         recover_delL_atomden_product(ADAS_dict, outdict, sion_H_transition=sion_H_transition)

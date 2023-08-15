@@ -1,3 +1,19 @@
 #!/bin/bash
-python /home/bloman/pyproc/cherab_bridge/run_cherab_bridge.py cherab_bridge_input_dict.json
+source /etc/profile.d/modules.sh
+
+export PYTHONPATH=$PYTHONPATH:"/home/adas/python/"
+export PYTHONPATH=$PYTHONPATH:"/home/jhl7340/"
+export PYTHONPATH=$PYTHONPATH:"/home/jhl7340/PESDT/"
+export PYTHONPATH=$PYTHONPATH:"/home/jhl7340/eproc/EPROC/python/eproc"
+export PYTHONPATH=$PYTHONPATH:"/home/jhl7340/eproc/EPROC/python"
+export CHERAB_CADMESH='/common/cadmesh/'
+
+module unload python/2.7.5
+module load python/3.9
+module load jet
+a=$(python3 --version)
+echo $a
+
+echo $(python --version)
+python3 /home/jhl7340/PESDT/cherab_bridge/run_cherab_bridge.py /home/jhl7340/PESDT/cherab_bridge/cherab_bridge_input_dict.json
 

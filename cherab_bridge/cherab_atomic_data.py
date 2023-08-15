@@ -57,7 +57,7 @@ class PESDT_AtomicData(AtomicData):
         rate_data = {
             "te": Te_arr,  # eV
             'ne': ne_arr,  # cm^3
-            'rate': PEC  # W.cm^3
+            'rate': PEC  # s^-1 cm^3
         }
 
         #pec_interpolator = ImpactExcitationRate(wavelength, rate_data)

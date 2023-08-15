@@ -1,4 +1,5 @@
 
+from statistics import multimode
 import numpy as np
 from raysect.core.math.function.float.function2d.interpolate import Discrete2DMesh
 
@@ -7,7 +8,7 @@ from cherab.edge2d.mesh_geometry import Edge2DMesh
 from cherab.edge2d.edge2d_plasma import Edge2DSimulation
 
 
-def load_edge2d_from_PESDT(PESDT):
+def load_edge2d_from_PESDT(PESDT, convert_denel_to_m3 = True):
 
     ########################################################################
     # Start by loading in all the data from B Lowmanowski's PESDT object #
@@ -25,6 +26,9 @@ def load_edge2d_from_PESDT(PESDT):
     ni = np.zeros(num_cells)
     n0 = np.zeros(num_cells)
 
+    multi = 1.0
+    if convert_denel_to_m3:
+        multi = 1e-6
 
     for ith_cell, cell in enumerate(PESDT.cells):
         # extract cell centres and vertices
@@ -37,9 +41,11 @@ def load_edge2d_from_PESDT(PESDT):
 
         te[ith_cell] = cell.te
         ti[ith_cell] = cell.te
-        ni[ith_cell] = cell.ni
-        ne[ith_cell] = cell.ne
-        n0[ith_cell] = cell.n0
+        # Multiply by 1e-6, I think cherab wants densities in cm^-3
+        
+        ni[ith_cell] = cell.ni*multi
+        ne[ith_cell] = cell.ne*multi
+        n0[ith_cell] = cell.n0*multi
 
         # Set to constant value, for debugging (COMMENT OUT!)
         # Settings for masking ISP and OSP emission
