@@ -1,0 +1,3 @@
+*.pyc
+cherab_bridge/batch/
+*.npy
