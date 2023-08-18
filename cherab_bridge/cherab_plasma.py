@@ -204,6 +204,6 @@ class CherabPlasma():
         #total_radiance_ph_s = PhotonToJ.inv(total_radiance.value.mean, centre_wav_nm)
         spectral_radiance_ph_s = PhotonToJ.inv(spectral_radiance.samples.mean, spectral_radiance.wavelengths)
         #Average over spectral bins
-        spectral_radiance_ph_s = np.sum(spectral_radiance_ph_s)*(max_wavelength_nm - min_wavelength_nm)*spectral_bins
+        spectral_radiance_ph_s = np.sum(spectral_radiance_ph_s)*(max_wavelength_nm - min_wavelength_nm)/spectral_bins
 
         return spectral_radiance_ph_s, spectral_radiance.wavelengths #total_radiance_ph_s, 
