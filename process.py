@@ -413,9 +413,9 @@ class ProcessEdgeSim:
                 # outdict[diag_key][chord.chord_num]['Srec'] = chord.los_int['Srec']
                 # outdict[diag_key][chord.chord_num]['Sion'] = chord.los_int['Sion']
                 if chord.shply_intersects_w_sep and diag_key=='KT3':
-                    outdict[diag_key][chord.chord_num].update({'chord':{'p1':chord.p1, 'p2':chord.p2unmod, 'w2':chord.w2unmod, 'sep_intersect_below_xpt':[chord.shply_intersects_w_sep.coords.xy[0][0],chord.shply_intersects_w_sep.coords.xy[1][0]]}})
+                    outdict[diag_key][chord.chord_num].update({'chord':{'p1':chord.p1, 'p2':chord.p2unmod, 'w1': chord.w1,'w2':chord.w2unmod, 'sep_intersect_below_xpt':[chord.shply_intersects_w_sep.coords.xy[0][0],chord.shply_intersects_w_sep.coords.xy[1][0]]}})
                 else:
-                    outdict[diag_key][chord.chord_num].update({'chord':{'p1':chord.p1, 'p2':chord.p2unmod, 'w2':chord.w2unmod, 'sep_intersect_below_xpt':None}})
+                    outdict[diag_key][chord.chord_num].update({'chord':{'p1':chord.p1, 'p2':chord.p2unmod, 'w1': chord.w1,'w2':chord.w2unmod, 'sep_intersect_below_xpt':None}})
                 if chord.los_angle:
                     outdict[diag_key][chord.chord_num]['chord']['los_angle'] = chord.los_angle
 

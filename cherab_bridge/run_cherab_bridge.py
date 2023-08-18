@@ -225,7 +225,7 @@ if __name__=='__main__':
     spec_line_dict = input_dict['spec_line_dict']
     diag_list = input_dict['diag_list']
     read_ADAS = input_dict['read_ADAS']
-    stark_transition = input_dict['cherab_options']['stark_transition']
+    stark_transition = input_dict['cherab_options'].get('stark_transition', 'false')
     ff_fb = input_dict['cherab_options']['ff_fb_emission']
     sion_H_transition = input_dict['cherab_options']['Sion_H_transition']
     srec_H_transition = input_dict['cherab_options']['Srec_H_transition']
@@ -249,7 +249,7 @@ if __name__=='__main__':
                 for diag_chord, val in synth_diag_dict[diag_key].items():
                     los_p1 = val['chord']['p1']
                     los_p2 = val['chord']['p2']
-                    los_w1 = 0.0
+                    los_w1 = val['chord']['w1']
                     los_w2 = val['chord']['w2']
                     H_lines = spec_line_dict['1']['1']
 
@@ -269,14 +269,14 @@ if __name__=='__main__':
 
                         plasma.define_plasma_model(atnum=1, ion_stage=0, transition=transition,
                                                    include_excitation=True, include_recombination=False)
-                        exc_radiance, exc_spectrum, wave = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2,
+                        exc_radiance, wave = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2, #, exc_spectrum,
                                                                                 min_wavelength, max_wavelength,
                                                                                 spectral_bins=spectral_bins, pixel_samples=pixel_samples)
 
                         plasma.define_plasma_model(atnum=1, ion_stage=0, transition=transition,
                                                    include_excitation=False, include_recombination=True)
 
-                        rec_radiance, rec_spectrum, wave = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2,
+                        rec_radiance, wave = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2, # rec_spectrum,
                                                                                 min_wavelength, max_wavelength,
                                                                                 spectral_bins=spectral_bins, pixel_samples=pixel_samples)
 
@@ -294,14 +294,14 @@ if __name__=='__main__':
                                 plasma.define_plasma_model(atnum=1, ion_stage=0, transition=transition,
                                                            include_excitation=True, include_recombination=True,
                                                            include_stark=True)
-                                radiance, spectrum, wave_arr = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2,
+                                radiance,  wave_arr = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2, #spectrum,
                                                                                     min_wavelength, max_wavelength,
                                                                                     spectral_bins=spectral_bins,
                                                                                     pixel_samples=pixel_samples,
                                                                                     display_progress=False)
 
                                 outdict[diag_key][diag_chord]['los_int']['stark']={'cwl': wavelength, 'wave': wave_arr.tolist(),
-                                                                                  'intensity': (spectrum*1e6).tolist(),
+                                                                                  'intensity': (radiance*1e6).tolist(),
                                                                                   'units': 'nm, ph s^-1 m^-2 sr^-1 nm^-1'}
 
                     # Free-free + free-bound using adaslib/continuo
@@ -312,7 +312,7 @@ if __name__=='__main__':
                             min_wave = 300
                             max_wave = 500
                             spec_bins = 50
-                            radiance, spectrum, wave_arr = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2,
+                            radiance,  wave_arr = plasma.integrate_los(los_p1, los_p2, los_w1, los_w2, #spectrum,
                                                                                 min_wave, max_wave,
                                                                                 spectral_bins=spec_bins,
                                                                                 pixel_samples=pixel_samples,
@@ -320,7 +320,7 @@ if __name__=='__main__':
 
                             outdict[diag_key][diag_chord]['los_int']['ff_fb_continuum'] = {
                                 'wave': wave_arr.tolist(),
-                                'intensity': (spectrum*1e6).tolist(),
+                                'intensity': (radiance*1e6).tolist(),
                                 'units': 'nm, ph s^-1 m^-2 sr^-1 nm^-1'}
 
 

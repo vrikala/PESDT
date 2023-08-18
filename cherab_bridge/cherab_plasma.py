@@ -187,10 +187,11 @@ class CherabPlasma():
         acceptance_angle = 2. * atan( (los_w2/2.0) / chord_length) * 180. / np.pi
 
         # Define pipelines and observe
+        # "total radiance" is not total radiance, its something else. Kept here because the code crahshes without it (perhaps no list when only 1 pipeline is given?)
         total_radiance = RadiancePipeline0D()
         spectral_radiance = SpectralRadiancePipeline0D(display_progress=display_progress)
-        fibre = FibreOptic([total_radiance, spectral_radiance], acceptance_angle=acceptance_angle,
-                           radius=0.01,
+        fibre = FibreOptic([ total_radiance, spectral_radiance], acceptance_angle=acceptance_angle,  #total_radiance,
+                           radius=0.01, #width of the pinhole is not recorded anywhere, assume 1cm?
                            spectral_bins=spectral_bins, spectral_rays=1, pixel_samples=pixel_samples,
                            transform = translate(*origin) * rotate_basis(direction, 
                            Vector3D(1, 0, 0)), parent = self.world)
@@ -200,7 +201,9 @@ class CherabPlasma():
 
         # convert from W/str/m^2 to ph/s/str/m^2
         centre_wav_nm = (max_wavelength_nm - min_wavelength_nm)/2.0
-        total_radiance_ph_s = PhotonToJ.inv(total_radiance.value.mean, centre_wav_nm)
+        #total_radiance_ph_s = PhotonToJ.inv(total_radiance.value.mean, centre_wav_nm)
         spectral_radiance_ph_s = PhotonToJ.inv(spectral_radiance.samples.mean, spectral_radiance.wavelengths)
+        #Average over spectral bins
+        spectral_radiance_ph_s = np.sum(spectral_radiance_ph_s)*(max_wavelength_nm - min_wavelength_nm)*spectral_bins
 
-        return total_radiance_ph_s, spectral_radiance_ph_s, spectral_radiance.wavelengths
+        return spectral_radiance_ph_s, spectral_radiance.wavelengths #total_radiance_ph_s, 

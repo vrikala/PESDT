@@ -110,9 +110,9 @@ for casekey, case in cases.items():
 
     plot_dict = {
             'spec_line_dict':spec_line_dict,
-            'cherab_bridge_results': True,
+            'cherab_bridge_results': False,
             'cherab_reflections': False,
-            'cherab_abs_factor': {'1215.2': 115., '6561.9': 615., '4101.2': 349.3, '3969.5': 370.},
+            'cherab_abs_factor': {'1215.2': 1.0, '6561.9': 1.0, '4101.2': 1.0, '3969.5': 1.0},#{'1215.2': 115., '6561.9': 615., '4101.2': 349.3, '3969.5': 370.},
             #'prof_param_defs': {'diag': 'KT1V', 'axs': ax0,
             #                    'include_pars_at_max_ne_along_LOS': False,
             #                    'include_sum_Sion_Srec': False,
@@ -121,7 +121,7 @@ for casekey, case in cases.items():
             #                    'Srec_H_transition': [[7, 2]],
             #                    'coord': 'R',  # 'angle' 'R' 'Z'
             #                    'color': case['sim_color'], 'linestyle':'--','zorder': 10},
-            'prof_Hemiss_defs':{'diag': 'KT3B',
+            'prof_Hemiss_defs':{'diag': 'KS3O',
                                 'lines': spec_line_dict['1']['1'],
                                 'excrec': True,
                                 'axs': ax1,
