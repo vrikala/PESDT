@@ -52,13 +52,14 @@ hspace = 0.15  # the amount of height reserved for white space between subplots
 # Hydrogenic line emissions of format wl: [n, m], where n is the excited state
 # and m is the (exicitated) state after emission
 Hlines_dict = OrderedDict([
- #   ('1215.2', ['2', '1']), # Ly_a
- #   ('1025.3', ['3', '1']), # Ly_b
- #   ('972.1', ['4', '1']), # Ly_gamma
+    ('1215.2', ['2', '1']), # Ly_a
+    ('1025.3', ['3', '1']), # Ly_b
+    ('972.1',  ['4', '1']), # Ly_gamma
     ('6561.9', ['3', '2']), # Bal_a
-    ('4339.9', ['5', '2']), # Bal_b
- #   ('4101.2', ['6', '2']), # Bal_gamma
- #   ('3969.5', ['7', '2'])  # Bal_delta
+    ('4860.6', ['4', '2']), # Bal_b
+    ('4339.9', ['5', '2']), # Bal_gamma
+    ('4101.2', ['6', '2']), # Bal_delta
+    ('3969.5', ['7', '2'])  # Bal_epsilon
 ])
 
 spec_line_dict = {
@@ -110,8 +111,8 @@ for casekey, case in cases.items():
 
     plot_dict = {
             'spec_line_dict':spec_line_dict,
-            'cherab_bridge_results': False,
-            'cherab_reflections': False,
+            'cherab_bridge_results': True,
+            'cherab_reflections': True,
             'cherab_abs_factor': {'1215.2': 1.0, '6561.9': 1.0, '4101.2': 1.0, '3969.5': 1.0},#{'1215.2': 115., '6561.9': 615., '4101.2': 349.3, '3969.5': 370.},
             #'prof_param_defs': {'diag': 'KT1V', 'axs': ax0,
             #                    'include_pars_at_max_ne_along_LOS': False,
@@ -121,7 +122,7 @@ for casekey, case in cases.items():
             #                    'Srec_H_transition': [[7, 2]],
             #                    'coord': 'R',  # 'angle' 'R' 'Z'
             #                    'color': case['sim_color'], 'linestyle':'--','zorder': 10},
-            'prof_Hemiss_defs':{'diag': 'KS3O',
+            'prof_Hemiss_defs':{'diag': 'KT1V',
                                 'lines': spec_line_dict['1']['1'],
                                 'excrec': True,
                                 'axs': ax1,

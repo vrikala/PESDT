@@ -28,7 +28,7 @@ from shapely.geometry import Polygon, LineString
 from collections import namedtuple
 
 #from .. import process
-from pyproc import process
+from PESDT import process
 
 
 
