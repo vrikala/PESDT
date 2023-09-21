@@ -1,7 +1,6 @@
 from PESDT.analyse import AnalyseSynthDiag
 import json, os, sys
 import argparse
-from collections import OrderedDict
 
 def run_PESDT(input_dict_str):
 

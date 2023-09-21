@@ -11,7 +11,6 @@ from shapely.geometry import Polygon, LineString
 from .. import process
 
 import eproc as ep
-import idlbridge as idl
 
 # Duplicate from process.py
 # Unsure whether using this is necessary, Henri used it in his
@@ -409,64 +408,6 @@ class Edge2D():
             epdata = ep.data(self.tranfile,parstr)
             print(parstr, epdata.nPts)
             return {'data': epdata.data, 'npts': epdata.nPts}
-
-    def get_eproc_param_temp(self, funstr, parstr, par2str=None, args=None):
-        '''
-        Legacy function, which uses idl version of eproc
-        To be removed, since idlbridge is broken
-        '''
-        
-        idl.execute("""tranfile=' """ + self.tranfile + """ ' """)
-        if par2str and args:
-            if type(par2str) == int:
-                cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ',' + str(par2str) + ',' + args + ')'
-            elif type(par2str) == str:
-                cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ','  + """'""" + par2str + """'""" + ',' + args + ')'
-
-            idl.execute(cmd)
-            idl.execute('xdata=ret.xdata')
-            idl.execute('ydata=ret.ydata')
-            idl.execute('npts=ret.npts')
-            return {'xdata':idl.get('xdata'), 'ydata':idl.get('ydata'), 'npts':idl.get('npts')}
-        else:
-            cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ')'
-            idl.execute(cmd)
-            idl.execute('data=ret.data')
-            idl.execute('npts=ret.npts')
-            return {'data':idl.get('data'), 'npts':idl.get('npts')}
-
-
-
-    def get_eproc_row_ring_from_kval(self, kval):
-
-        row_match = -1
-        ring_match = -1
-            
-
-        idl.execute("""tranfile=' """ + self.tranfile + """/tran""" + """ ' """)
-
-        cmd = 'geom=EprocGeom(tranfile)'
-        idl.execute(cmd)
-        geom = idl.get('geom')
-        nrows = geom['nrows']
-        nrings = geom['nrings']
-        cmd = 'zmesh=EprocDataRead(tranfile,'+ """'""" + 'ZMESH' + """'""" + ')'
-        idl.execute(cmd)
-
-        for irow in range(1,nrows+1):
-            cmd = 'kpts_row = EprocRowPts(' + """'""" + str(irow) + """'""" + ',geom, zmesh)'
-            idl.execute(cmd)
-            kpts_row = idl.get('kpts_row')
-            if kval in kpts_row['data']: row_match = irow
-
-        for iring in range(1,nrings+1):
-            cmd = 'kpts_ring = EprocRingPts(' + """'""" + str(iring) + """'""" + ',geom)'
-            idl.execute(cmd)
-            kpts_ring = idl.get('kpts_ring')
-            if kval in kpts_ring['data']: ring_match = iring
-
-#        print(row_match, ring_match)
-        return row_match, ring_match
     
     # def read_eirene_data(self):
 
