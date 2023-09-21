@@ -8,11 +8,11 @@ in your .bashrc (if on JET-JDC), you should have the following lines:
 
 export PYTHONPATH=$PYTHONPATH:"/home/adas/python/"
 export PYTHONPATH=$PYTHONPATH:$HOME/PESDT
-export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/default/libs/eproc/python/eproc"
-export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/default/libs/eproc/python"
-
+export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/v280818/libs/eproc/python/eproc"
+export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/v280818/libs/eproc/python"
 export CHERAB_CADMESH='/common/cadmesh/'
 
+Alternatively, source the example bashrc-file included in the PESDT package
 These lines loads the adas and adaslib python routines, PESDT (the program you're about to use), and eproc (used for reading the EDGE2D-EIRENE tranfiles) as importable python libraries. The cherab cadmesh is the path to the JET wall cadmesh files, used by cherab for raytracing
 
 You also need a working installation of cherab. 
@@ -20,6 +20,10 @@ You also need a working installation of cherab.
 '''
 On 24/07/2023 PESDT switched to the 1.40 version of cherab. Older versions won't work with this edition of PESDT.
 '''
+
+To install Cherab, you'll need a functioning version of the "cython module"
+
+pip install Cython (Note: pre-release version 3.0.5a was used, but the new default 3.0.2 should work)
 
 To install Cherab, first install the core package with pip:
 

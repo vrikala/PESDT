@@ -1,0 +1,32 @@
+###
+# Example bashrc file for PESDT, which loads in the required modules
+# 
+###
+
+module purge
+module load python/3.9
+module load jet
+
+###
+# Resets pythonpath, pythonstartup
+export PYTHONPATH=
+export PYTHONSTARTUP=
+###
+
+export PYTHONPATH=$PYTHONPATH:/home/adas/python/
+export PYTHONPATH=$PYTHONPATH:$HOME
+export PYTHONPATH=$PYTHONPATH:$HOME/PESDT
+export PYTHONPATH=$PYTHONPATH:$HOME/PESDT/cherab_bridge
+# Point to eproc under VPR for now
+export PYTHONPATH=$PYTHONPATH:/home/jhl7340/eproc/EPROC/python/eproc
+export PYTHONPATH=$PYTHONPATH:/home/jhl7340/eproc/EPROC/python
+# For Mathias, he seems to need this
+export PYTHONPATH=$PYTHONPATH:$HOME/.local/lib/python3.9/site-packages
+
+# These point to the eproc version that should be used...
+# Commented out for now, until PESDT is adapted for these
+#export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/default/libs/eproc/python/eproc"
+#export PYTHONPATH=$PYTHONPATH:"/u/sim/jintrac/default/libs/eproc/python"
+
+export CHERAB_CADMESH='/common/cadmesh/'
+
