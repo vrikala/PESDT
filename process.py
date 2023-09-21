@@ -13,8 +13,9 @@ from scipy.interpolate import interp1d
 from shapely.geometry import Polygon, LineString
 from PESDT.machine_defs import get_DIIIDdefs, get_JETdefs
 from PESDT.pyADASread import adas_adf11_read, adas_adf15_read, continuo_read
-from PESDT.edge_code_formats.edge2d_format import Edge2D, Cell, get_eproc_param
+from PESDT.edge_code_formats.edge2d_format import Edge2D, Cell
 from PESDT.edge_code_formats.solps_format import SOLPS
+
 
 
 at_sym = ['H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg',
@@ -66,6 +67,35 @@ def interp_nearest_neighb(point, neighbs, neighbs_param_pervol):
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+def get_eproc_param(self, funstr, parstr, par2str=None, args=None):
+    '''
+    Uses Python eproc to load data from a tran file
+    funstr: eproc function name
+    parstr: tran file variable name (e.g. "DENEL" or "TEV")
+    par2str: identifier for location ('OT', 'IT', 'OMP', 'IMP') or location
+             as an integer index 
+    args: seemingly unused, execpt for accesing eproc ring/row
+    
+    '''
+    if par2str and args:
+        if type(par2str) == int:
+            cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ',' + str(par2str) + ',' + args + ')'
+        elif type(par2str) == str:
+            cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ','  + """'""" + par2str + """'""" + ',' + args + ')'
+
+        print(cmd)
+        if funstr == "EprocRow":
+            epdata = ep.row(self.tranfile,parstr,par2str)
+        else:
+            epdata = ep.ring(self.tranfile,parstr,par2str)
+        return {'xdata': epdata.xData, 'ydata': epdata.yData, 'npts': epdata.nPts}
+
+    else:
+        cmd = 'ret=' + funstr +'(tranfile,'+ """'""" + parstr + """'""" + ')'
+        epdata = ep.data(self.tranfile,parstr)
+        print(parstr, epdata.nPts)
+        return {'data': epdata.data, 'npts': epdata.nPts}
 
 class Region:
 
