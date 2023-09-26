@@ -190,11 +190,21 @@ class Edge2D():
         
         self.zch = self.get_eproc_param("EprocDataRead", 'ZCH') # impurity atomic number (max 2 impurities)
         self.nz = self.get_eproc_param("EprocDataRead", 'NZ') #  number of impurity charge states (max 2 impurities)
+        # Convert zch, nz to int 
+        zch = []
+        nz = []
+        for i in self.zch['data']:
+            zch.append(int(floatToBits(i)))
+        for i in self.nz['data']:
+            nz.append(int(floatToBits(i)))
+        self.zch['data'] = np.array(zch)
+        self.nz['data'] = np.array(nz)
+
         if self.zch['data'][0] > 0.0:
-            self.imp1_atom_num = int(floatToBits(self.zch['data'][0]))
+            self.imp1_atom_num = self.zch['data'][0]
             # First append neutral density, then each charge state density
             _imp1_denz.append(self.get_eproc_param("EprocDataRead", 'DZ_1'))
-            for i in range(int(floatToBits(self.zch['data'][0]))):
+            for i in range(self.zch['data'][0]):
                 if i < 9 :
                     stridx = '0' + str(i+1)
                     _imp1_chrg_idx.append(stridx)
@@ -203,17 +213,17 @@ class Edge2D():
                     _imp1_chrg_idx.append(stridx)
                 _imp1_denz.append(self.get_eproc_param("EprocDataRead", 'DENZ'+stridx))
             if self.zch['data'][1] > 0.0:
-                self.imp2_atom_num = int(floatToBits(self.zch['data'][1]))
-                self.imp2_bundle_num = int(floatToBits(self.nz['data'][1]))
+                self.imp2_atom_num = self.zch['data'][1]
+                self.imp2_bundle_num = self.nz['data'][1]
                 # First append neutral density, then each charge state density
                 _imp2_denz.append(self.get_eproc_param_temp("EprocDataRead", 'DZ_2'))
                 self.imp2_chargez.append({'data':[0]*_x[0]})
-                for i in range(int(floatToBits(self.nz['data'][1]))):
-                    if i + int(floatToBits(self.zch['data'][0])) < 9:
-                        stridx = '0' + str(i + 1 + int(floatToBits(self.zch['data'][0])))
+                for i in range(self.nz['data'][1]):
+                    if i + self.zch['data'][0] < 9:
+                        stridx = '0' + str(i + 1 + self.zch['data'][0])
                         _imp2_chrg_idx.append(stridx)
                     else:
-                        stridx = str(i + 1 + int(self.zch['data'][0]))
+                        stridx = str(i + 1 + self.zch['data'][0])
                         _imp2_chrg_idx.append(stridx)
                     _imp2_denz.append(self.get_eproc_param("EprocDataRead", 'DENZ'+stridx))
                     self.imp2_chargez.append(self.get_eproc_param("EprocDataRead", 'ZI'+stridx))

@@ -319,6 +319,7 @@ class ProcessEdgeSim:
         if self.spec_line_dict and (self.data.imp1_atom_num 
             or self.data.imp2_atom_num):
             self.calc_imp_emiss()
+            self.calc_imp_rad_power()
 
         # CALULCATE PRAD IN DEFINED MACRO REGIONS
         # TODO: Add opacity calcs
